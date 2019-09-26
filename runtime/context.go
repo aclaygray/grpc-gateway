@@ -130,7 +130,17 @@ func annotateContext(ctx context.Context, mux *ServeMux, req *http.Request) (con
 		pr := &peer.Peer{
 			AuthInfo: credentials.TLSInfo{State: *req.TLS},
 		}
+		grpclog.Error("This is req.TLS", *req.TLS)
+		grpclog.Error("This is pr", pr)
 		ctx = peer.NewContext(ctx, pr)
+
+		fromCtx,ok := peer.FromContext(ctx);
+		if !ok {
+			grpclog.Error("Not ok!")
+		}
+
+		grpclog.Error("fromCtx:", fromCtx)
+
 	} else {
 		grpclog.Error("doggerErr")
 		os.Stdout.WriteString("dogger")
