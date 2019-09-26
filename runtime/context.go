@@ -12,8 +12,10 @@ import (
 	"time"
 
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/peer"
 	"google.golang.org/grpc/status"
 )
 
@@ -119,6 +121,13 @@ func annotateContext(ctx context.Context, mux *ServeMux, req *http.Request) (con
 		pairs = append(pairs, strings.ToLower(xForwardedHost), host)
 	} else if req.Host != "" {
 		pairs = append(pairs, strings.ToLower(xForwardedHost), req.Host)
+	}
+
+	if req.TLS != nil {
+		pr := &peer.Peer{
+			AuthInfo: credentials.TLSInfo{State: *req.TLS},
+		}
+		ctx = peer.NewContext(ctx, pr)
 	}
 
 	if addr := req.RemoteAddr; addr != "" {
