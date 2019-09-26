@@ -7,6 +7,7 @@ import (
 	"net"
 	"net/http"
 	"net/textproto"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -124,10 +125,15 @@ func annotateContext(ctx context.Context, mux *ServeMux, req *http.Request) (con
 	}
 
 	if req.TLS != nil {
+		grpclog.Error("catterErr")
+		os.Stdout.WriteString("catter")
 		pr := &peer.Peer{
 			AuthInfo: credentials.TLSInfo{State: *req.TLS},
 		}
 		ctx = peer.NewContext(ctx, pr)
+	} else {
+		grpclog.Error("doggerErr")
+		os.Stdout.WriteString("dogger")
 	}
 
 	if addr := req.RemoteAddr; addr != "" {
