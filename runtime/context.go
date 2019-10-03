@@ -7,7 +7,6 @@ import (
 	"net"
 	"net/http"
 	"net/textproto"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -60,6 +59,13 @@ except that the forwarded destination is not another HTTP service but rather
 a gRPC service.
 */
 func AnnotateContext(ctx context.Context, mux *ServeMux, req *http.Request) (context.Context, error) {
+	fromCtx,ok := peer.FromContext(ctx)
+	if !ok {
+		grpclog.Error("Not ok!")
+	}
+
+	grpclog.Error("agrayLoggit: grpc-gateway.AnnotateContext.fromCtx1:", fromCtx)
+
 	ctx, md, err := annotateContext(ctx, mux, req)
 	if err != nil {
 		return nil, err
@@ -68,21 +74,21 @@ func AnnotateContext(ctx context.Context, mux *ServeMux, req *http.Request) (con
 		return ctx, nil
 	}
 
-	fromCtx2,ok := peer.FromContext(ctx);
+	fromCtx,ok = peer.FromContext(ctx)
 	if !ok {
 		grpclog.Error("Not ok!")
 	}
 
-	grpclog.Error("AnnotateContext fromCtx1:", fromCtx2)
+	grpclog.Error("agrayLoggit: grpc-gateway.AnnotateContext.fromCtx2:", fromCtx)
 
 	newCtx := metadata.NewOutgoingContext(ctx, md)
 
-	fromCtx2,ok = peer.FromContext(ctx);
+	fromCtx,ok = peer.FromContext(newCtx)
 	if !ok {
 		grpclog.Error("Not ok!")
 	}
 
-	grpclog.Error("AnnotateContext fromCtx2:", fromCtx2)
+	grpclog.Error("agrayLoggit: grpc-gateway.AnnotateContext.fromCtx3:", newCtx)
 
 	return newCtx, nil
 }
@@ -144,8 +150,9 @@ func annotateContext(ctx context.Context, mux *ServeMux, req *http.Request) (con
 		pr := &peer.Peer{
 			AuthInfo: credentials.TLSInfo{State: *req.TLS},
 		}
-		grpclog.Error("This is req.TLS", *req.TLS)
-		grpclog.Error("This is pr", pr)
+		grpclog.Error("agrayLoggit: grpc-gateway: This is req.TLS", *req.TLS)
+		grpclog.Error("agrayLoggit: grpc-gateway: This is pr", pr)
+
 		ctx = peer.NewContext(ctx, pr)
 
 		fromCtx,ok := peer.FromContext(ctx);
@@ -153,18 +160,9 @@ func annotateContext(ctx context.Context, mux *ServeMux, req *http.Request) (con
 			grpclog.Error("Not ok!")
 		}
 
-		grpclog.Error("fromCtx:", fromCtx)
-
-		fromCtx2,ok := peer.FromContext(ctx);
-		if !ok {
-			grpclog.Error("Not ok!")
-		}
-
-		grpclog.Error("fromCtx2:", fromCtx2)
-
+		grpclog.Error("agrayLoggit: grpc-gateway: fromCtx1:", fromCtx)
 	} else {
-		grpclog.Error("doggerErr")
-		os.Stdout.WriteString("dogger")
+		grpclog.Error("agrayLoggit: grpc-gateway: no req.TLS")
 	}
 
 	if addr := req.RemoteAddr; addr != "" {
@@ -183,12 +181,12 @@ func annotateContext(ctx context.Context, mux *ServeMux, req *http.Request) (con
 		ctx, _ = context.WithTimeout(ctx, timeout)
 	}
 	if len(pairs) == 0 {
-		fromCtx2,ok := peer.FromContext(ctx);
+		fromCtx,ok := peer.FromContext(ctx)
 		if !ok {
 			grpclog.Error("Not ok!")
 		}
 
-		grpclog.Error("fromCtx3:", fromCtx2)
+		grpclog.Error("agrayLoggit: grpc-gateway: fromCtx2:", fromCtx)
 
 		return ctx, nil, nil
 	}
@@ -197,12 +195,12 @@ func annotateContext(ctx context.Context, mux *ServeMux, req *http.Request) (con
 		md = metadata.Join(md, mda(ctx, req))
 	}
 
-	fromCtx2,ok := peer.FromContext(ctx);
+	fromCtx,ok := peer.FromContext(ctx)
 	if !ok {
 		grpclog.Error("Not ok!")
 	}
 
-	grpclog.Error("fromCtx4:", fromCtx2)
+	grpclog.Error("agrayLoggit: grpc-gateway: fromCtx3:", fromCtx)
 
 	return ctx, md, nil
 }
