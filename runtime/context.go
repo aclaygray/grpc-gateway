@@ -79,6 +79,7 @@ func AnnotateContext(ctx context.Context, mux *ServeMux, req *http.Request) (con
 		grpclog.Error("Not ok!")
 	}
 
+	grpclog.Error("agrayLoggit: grpc-gateway.AnnotateContext.ctx:", ctx)
 	grpclog.Error("agrayLoggit: grpc-gateway.AnnotateContext.fromCtx2:", fromCtx)
 
 	newCtx := metadata.NewOutgoingContext(ctx, md)
@@ -88,7 +89,8 @@ func AnnotateContext(ctx context.Context, mux *ServeMux, req *http.Request) (con
 		grpclog.Error("Not ok!")
 	}
 
-	grpclog.Error("agrayLoggit: grpc-gateway.AnnotateContext.fromCtx3:", newCtx)
+	grpclog.Error("agrayLoggit: grpc-gateway.AnnotateContext.newCtx:", newCtx)
+	grpclog.Error("agrayLoggit: grpc-gateway.AnnotateContext.fromCtx3:", fromCtx)
 
 	return newCtx, nil
 }
