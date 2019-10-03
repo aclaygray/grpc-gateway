@@ -125,8 +125,6 @@ func annotateContext(ctx context.Context, mux *ServeMux, req *http.Request) (con
 	}
 
 	if req.TLS != nil {
-		grpclog.Error("catterErr")
-		os.Stdout.WriteString("catter")
 		pr := &peer.Peer{
 			AuthInfo: credentials.TLSInfo{State: *req.TLS},
 		}
@@ -140,6 +138,13 @@ func annotateContext(ctx context.Context, mux *ServeMux, req *http.Request) (con
 		}
 
 		grpclog.Error("fromCtx:", fromCtx)
+
+		fromCtx2,ok := peer.FromContext(ctx);
+		if !ok {
+			grpclog.Error("Not ok!")
+		}
+
+		grpclog.Error("fromCtx2:", fromCtx2)
 
 	} else {
 		grpclog.Error("doggerErr")
@@ -162,12 +167,27 @@ func annotateContext(ctx context.Context, mux *ServeMux, req *http.Request) (con
 		ctx, _ = context.WithTimeout(ctx, timeout)
 	}
 	if len(pairs) == 0 {
+		fromCtx2,ok := peer.FromContext(ctx);
+		if !ok {
+			grpclog.Error("Not ok!")
+		}
+
+		grpclog.Error("fromCtx3:", fromCtx2)
+
 		return ctx, nil, nil
 	}
 	md := metadata.Pairs(pairs...)
 	for _, mda := range mux.metadataAnnotators {
 		md = metadata.Join(md, mda(ctx, req))
 	}
+
+	fromCtx2,ok := peer.FromContext(ctx);
+	if !ok {
+		grpclog.Error("Not ok!")
+	}
+
+	grpclog.Error("fromCtx4:", fromCtx2)
+
 	return ctx, md, nil
 }
 
