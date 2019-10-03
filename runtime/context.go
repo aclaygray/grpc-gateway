@@ -68,7 +68,23 @@ func AnnotateContext(ctx context.Context, mux *ServeMux, req *http.Request) (con
 		return ctx, nil
 	}
 
-	return metadata.NewOutgoingContext(ctx, md), nil
+	fromCtx2,ok := peer.FromContext(ctx);
+	if !ok {
+		grpclog.Error("Not ok!")
+	}
+
+	grpclog.Error("AnnotateContext fromCtx1:", fromCtx2)
+
+	newCtx := metadata.NewOutgoingContext(ctx, md)
+
+	fromCtx2,ok = peer.FromContext(ctx);
+	if !ok {
+		grpclog.Error("Not ok!")
+	}
+
+	grpclog.Error("AnnotateContext fromCtx2:", fromCtx2)
+
+	return newCtx, nil
 }
 
 // AnnotateIncomingContext adds context information such as metadata from the request.
